@@ -1,3 +1,8 @@
+export interface CarFeature {
+  label: string;
+  icon: string;
+}
+
 export interface Car {
   id: string;
   year: number;
@@ -6,10 +11,11 @@ export interface Car {
   auctionDate: string;
   image: string;
   mileage: string;
+  mileageIcon: string;
   engine: string;
+  engineIcon: string;
   fuelType: string;
-  features: {
-    abs: boolean;
-  };
+  fuelIcon: string;
+  features: CarFeature[];
   price: number;
 }

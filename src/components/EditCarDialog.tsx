@@ -9,8 +9,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Car } from "@/types/car";
+import { Car, CarFeature } from "@/types/car";
+import { IconPicker } from "@/components/IconPicker";
+import { Trash2, Plus } from "lucide-react";
 
 interface EditCarDialogProps {
   car: Car;
@@ -31,6 +32,26 @@ export const EditCarDialog = ({ car, open, onOpenChange, onSave }: EditCarDialog
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const addFeature = () => {
+    setEditedCar({
+      ...editedCar,
+      features: [...editedCar.features, { label: "", icon: "Circle" }],
+    });
+  };
+
+  const updateFeature = (index: number, field: keyof CarFeature, value: string) => {
+    const newFeatures = [...editedCar.features];
+    newFeatures[index] = { ...newFeatures[index], [field]: value };
+    setEditedCar({ ...editedCar, features: newFeatures });
+  };
+
+  const removeFeature = (index: number) => {
+    setEditedCar({
+      ...editedCar,
+      features: editedCar.features.filter((_, i) => i !== index),
+    });
   };
 
   const handleSave = () => {
@@ -107,32 +128,50 @@ export const EditCarDialog = ({ car, open, onOpenChange, onSave }: EditCarDialog
             )}
           </div>
           
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="mileage">Mileage</Label>
-              <Input
-                id="mileage"
-                value={editedCar.mileage}
-                onChange={(e) => setEditedCar({ ...editedCar, mileage: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="engine">Engine</Label>
-              <Input
-                id="engine"
-                value={editedCar.engine}
-                onChange={(e) => setEditedCar({ ...editedCar, engine: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="fuelType">Fuel Type</Label>
-              <Input
-                id="fuelType"
-                value={editedCar.fuelType}
-                onChange={(e) => setEditedCar({ ...editedCar, fuelType: e.target.value })}
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="mileage">Mileage</Label>
+            <Input
+              id="mileage"
+              value={editedCar.mileage}
+              onChange={(e) => setEditedCar({ ...editedCar, mileage: e.target.value })}
+            />
           </div>
+
+          <IconPicker
+            value={editedCar.mileageIcon}
+            onChange={(icon) => setEditedCar({ ...editedCar, mileageIcon: icon })}
+            label="Mileage Icon"
+          />
+
+          <div className="space-y-2">
+            <Label htmlFor="engine">Engine</Label>
+            <Input
+              id="engine"
+              value={editedCar.engine}
+              onChange={(e) => setEditedCar({ ...editedCar, engine: e.target.value })}
+            />
+          </div>
+
+          <IconPicker
+            value={editedCar.engineIcon}
+            onChange={(icon) => setEditedCar({ ...editedCar, engineIcon: icon })}
+            label="Engine Icon"
+          />
+
+          <div className="space-y-2">
+            <Label htmlFor="fuelType">Fuel Type</Label>
+            <Input
+              id="fuelType"
+              value={editedCar.fuelType}
+              onChange={(e) => setEditedCar({ ...editedCar, fuelType: e.target.value })}
+            />
+          </div>
+
+          <IconPicker
+            value={editedCar.fuelIcon}
+            onChange={(icon) => setEditedCar({ ...editedCar, fuelIcon: icon })}
+            label="Fuel Icon"
+          />
           
           <div className="space-y-2">
             <Label htmlFor="price">Price ($)</Label>
@@ -144,18 +183,42 @@ export const EditCarDialog = ({ car, open, onOpenChange, onSave }: EditCarDialog
             />
           </div>
           
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="abs"
-              checked={editedCar.features.abs}
-              onCheckedChange={(checked) => 
-                setEditedCar({ 
-                  ...editedCar, 
-                  features: { ...editedCar.features, abs: checked } 
-                })
-              }
-            />
-            <Label htmlFor="abs">ABS Feature</Label>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-lg font-semibold">Features</Label>
+              <Button type="button" onClick={addFeature} size="sm" variant="outline">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Feature
+              </Button>
+            </div>
+
+            {editedCar.features.map((feature, index) => (
+              <div key={index} className="flex gap-2 items-end">
+                <div className="flex-1 space-y-2">
+                  <Label>Feature Label</Label>
+                  <Input
+                    value={feature.label}
+                    onChange={(e) => updateFeature(index, "label", e.target.value)}
+                    placeholder="e.g., ABS, Airbags"
+                  />
+                </div>
+                <div className="flex-1">
+                  <IconPicker
+                    value={feature.icon}
+                    onChange={(icon) => updateFeature(index, "icon", icon)}
+                    label="Icon"
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  onClick={() => removeFeature(index)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
           </div>
         </div>
         

@@ -22,6 +22,8 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          dark: "hsl(var(--primary-dark))",
+          light: "hsl(var(--primary-light))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -84,6 +86,14 @@ export default {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+      },
+      backgroundImage: {
+        'gradient-primary': 'var(--gradient-primary)',
+        'gradient-secondary': 'var(--gradient-secondary)',
+      },
+      boxShadow: {
+        'card': 'var(--shadow-card)',
+        'elevated': 'var(--shadow-elevated)',
       },
     },
   },

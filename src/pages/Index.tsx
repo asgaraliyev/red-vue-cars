@@ -49,14 +49,55 @@ const Index = () => {
     setIsDownloading(true);
     
     try {
+      // Load the image to get its natural dimensions
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+        img.src = car.image;
+      });
+      
+      // Calculate dimensions preserving aspect ratio
+      const targetWidth = 1200;
+      const aspectRatio = img.naturalHeight / img.naturalWidth;
+      const targetHeight = targetWidth * aspectRatio;
+      
+      // Find the image container and image element
+      const imageContainer = carCardRef.current.querySelector('.relative.h-\\[75vh\\]') as HTMLElement;
+      const imageElement = imageContainer?.querySelector('img') as HTMLImageElement;
+      
+      if (!imageContainer || !imageElement) {
+        throw new Error("Image elements not found");
+      }
+      
+      // Store original styles
+      const originalContainerStyle = imageContainer.style.cssText;
+      const originalImageStyle = imageElement.style.cssText;
+      const originalImageClass = imageElement.className;
+      
+      // Apply temporary styles for download
+      imageContainer.style.cssText = `height: ${targetHeight}px !important; min-height: ${targetHeight}px !important;`;
+      imageElement.style.cssText = 'width: 100%; height: 100%; object-fit: contain;';
+      imageElement.className = imageElement.className.replace('object-cover', 'object-contain');
+      
+      // Wait a bit for styles to apply
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       const canvas = await html2canvas(carCardRef.current, {
         scale: 2,
         useCORS: true,
         allowTaint: true,
         logging: false,
-        backgroundColor: null,
+        backgroundColor: '#ffffff',
         foreignObjectRendering: false,
       });
+      
+      // Restore original styles
+      imageContainer.style.cssText = originalContainerStyle;
+      imageElement.style.cssText = originalImageStyle;
+      imageElement.className = originalImageClass;
       
       const link = document.createElement("a");
       link.download = `${car.year}-${car.model.replace(/\s+/g, "-")}.png`;
@@ -65,6 +106,7 @@ const Index = () => {
       
       toast.success("Image downloaded successfully!");
     } catch (error) {
+      console.error("Download error:", error);
       toast.error("Failed to download image");
     } finally {
       setIsDownloading(false);

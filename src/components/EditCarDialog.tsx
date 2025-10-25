@@ -22,6 +22,17 @@ interface EditCarDialogProps {
 export const EditCarDialog = ({ car, open, onOpenChange, onSave }: EditCarDialogProps) => {
   const [editedCar, setEditedCar] = useState(car);
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setEditedCar({ ...editedCar, image: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSave = () => {
     onSave(editedCar);
     onOpenChange(false);
@@ -77,12 +88,23 @@ export const EditCarDialog = ({ car, open, onOpenChange, onSave }: EditCarDialog
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="image">Image URL</Label>
+            <Label htmlFor="image">Car Photo</Label>
             <Input
               id="image"
-              value={editedCar.image}
-              onChange={(e) => setEditedCar({ ...editedCar, image: e.target.value })}
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="cursor-pointer"
             />
+            {editedCar.image && (
+              <div className="mt-2">
+                <img 
+                  src={editedCar.image} 
+                  alt="Car preview" 
+                  className="w-full h-48 object-cover rounded-lg border"
+                />
+              </div>
+            )}
           </div>
           
           <div className="grid grid-cols-3 gap-4">

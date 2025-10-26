@@ -152,42 +152,44 @@ const Index = () => {
                 </div>
               </div>
               
-              <div className="p-6">
-                <div className="grid grid-cols-4 md:grid-cols-6 gap-3 mb-4">
-                  {car.features.map((feature, index) => {
-                    const FeatureIcon = Icons[feature.icon as keyof typeof Icons] as LucideIcon || Icons.Circle;
-                    return (
-                      <div key={index} className="flex flex-col items-center justify-center p-2 bg-muted rounded-lg">
-                        <FeatureIcon className="h-5 w-5 mb-1 text-primary" />
-                        <span className="font-medium text-xs text-center">{feature.label}</span>
-                      </div>
-                    );
-                  })}
-                  <div className="flex flex-col items-center justify-center p-2 bg-muted rounded-lg">
-                    {(() => {
-                      const MileageIcon = Icons[car.mileageIcon as keyof typeof Icons] as LucideIcon || Icons.Gauge;
-                      return <MileageIcon className="h-5 w-5 mb-1 text-primary" />;
-                    })()}
-                    <span className="font-medium text-xs text-center">{car.mileage}</span>
+              <div className="p-4">
+                <div className="flex items-center gap-6">
+                  <div className="text-5xl md:text-6xl font-bold text-primary shrink-0">
+                    {car.price}$
                   </div>
-                  <div className="flex flex-col items-center justify-center p-2 bg-muted rounded-lg">
-                    {(() => {
-                      const EngineIcon = Icons[car.engineIcon as keyof typeof Icons] as LucideIcon || Icons.Settings;
-                      return <EngineIcon className="h-5 w-5 mb-1 text-primary" />;
-                    })()}
-                    <span className="font-medium text-xs text-center">{car.engine}</span>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 flex-1">
+                    {car.features.map((feature, index) => {
+                      const FeatureIcon = Icons[feature.icon as keyof typeof Icons] as LucideIcon || Icons.Circle;
+                      return (
+                        <div key={index} className="flex flex-col items-center justify-center p-3 bg-muted rounded-lg">
+                          <FeatureIcon className="h-7 w-7 mb-1 text-primary" />
+                          <span className="font-medium text-sm text-center">{feature.label}</span>
+                        </div>
+                      );
+                    })}
+                    <div className="flex flex-col items-center justify-center p-3 bg-muted rounded-lg">
+                      {(() => {
+                        const MileageIcon = Icons[car.mileageIcon as keyof typeof Icons] as LucideIcon || Icons.Gauge;
+                        return <MileageIcon className="h-7 w-7 mb-1 text-primary" />;
+                      })()}
+                      <span className="font-medium text-sm text-center">{car.mileage}</span>
+                    </div>
+                    <div className="flex flex-col items-center justify-center p-3 bg-muted rounded-lg">
+                      {(() => {
+                        const EngineIcon = Icons[car.engineIcon as keyof typeof Icons] as LucideIcon || Icons.Settings;
+                        return <EngineIcon className="h-7 w-7 mb-1 text-primary" />;
+                      })()}
+                      <span className="font-medium text-sm text-center">{car.engine}</span>
+                    </div>
+                    <div className="flex flex-col items-center justify-center p-3 bg-muted rounded-lg">
+                      {(() => {
+                        const FuelIcon = Icons[car.fuelIcon as keyof typeof Icons] as LucideIcon || Icons.Fuel;
+                        return <FuelIcon className="h-7 w-7 mb-1 text-primary" />;
+                      })()}
+                      <span className="font-medium text-sm text-center">{car.fuelType}</span>
+                    </div>
                   </div>
-                  <div className="flex flex-col items-center justify-center p-2 bg-muted rounded-lg">
-                    {(() => {
-                      const FuelIcon = Icons[car.fuelIcon as keyof typeof Icons] as LucideIcon || Icons.Fuel;
-                      return <FuelIcon className="h-5 w-5 mb-1 text-primary" />;
-                    })()}
-                    <span className="font-medium text-xs text-center">{car.fuelType}</span>
-                  </div>
-                </div>
-                
-                <div className="text-5xl md:text-6xl font-bold text-primary">
-                  {car.price}$
                 </div>
               </div>
             </div>

@@ -54,19 +54,36 @@ const Index = () => {
       const targetHeight = 1200;
       const fixedCardWidth = 1200;
       
-      // Store original styles
-      const originalStyle = carCardRef.current.style.cssText;
-      const originalWidth = carCardRef.current.style.width;
+      // Find the image container and image element
+      const imageContainer = carCardRef.current.querySelector('.relative.h-\\[75vh\\]') as HTMLElement;
+      const imageElement = imageContainer?.querySelector('img') as HTMLImageElement;
       
-      // Set fixed width for consistent capture
+      if (!imageContainer || !imageElement) {
+        throw new Error("Image elements not found");
+      }
+      
+      // Store original styles
+      const originalCardStyle = carCardRef.current.style.cssText;
+      const originalContainerStyle = imageContainer.style.cssText;
+      const originalImageStyle = imageElement.style.cssText;
+      const originalImageClass = imageElement.className;
+      
+      // Set fixed width for card
       carCardRef.current.style.width = `${fixedCardWidth}px`;
       carCardRef.current.style.minWidth = `${fixedCardWidth}px`;
       carCardRef.current.style.maxWidth = `${fixedCardWidth}px`;
       
+      // Remove fixed height and let image display at natural aspect ratio
+      imageContainer.style.height = 'auto';
+      imageContainer.style.minHeight = 'auto';
+      imageElement.style.width = '100%';
+      imageElement.style.height = 'auto';
+      imageElement.className = imageElement.className.replace('object-cover', 'object-contain');
+      
       // Wait for layout to settle
       await new Promise(resolve => setTimeout(resolve, 100));
       
-      // Capture the card at fixed width
+      // Capture the card at fixed width with natural image aspect ratio
       const originalCanvas = await html2canvas(carCardRef.current, {
         scale: 1,
         useCORS: true,
@@ -78,10 +95,10 @@ const Index = () => {
       });
       
       // Restore original styles
-      carCardRef.current.style.cssText = originalStyle;
-      if (originalWidth) {
-        carCardRef.current.style.width = originalWidth;
-      }
+      carCardRef.current.style.cssText = originalCardStyle;
+      imageContainer.style.cssText = originalContainerStyle;
+      imageElement.style.cssText = originalImageStyle;
+      imageElement.className = originalImageClass;
       
       // Create a new canvas with fixed dimensions
       const finalCanvas = document.createElement('canvas');

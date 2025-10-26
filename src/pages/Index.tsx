@@ -49,59 +49,71 @@ const Index = () => {
     setIsDownloading(true);
     
     try {
-      // Load the image to get its natural dimensions
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      
-      await new Promise((resolve, reject) => {
-        img.onload = resolve;
-        img.onerror = reject;
-        img.src = car.image;
-      });
-      
-      // Calculate dimensions preserving aspect ratio
+      // Fixed target dimensions for download
       const targetWidth = 1200;
-      const aspectRatio = img.naturalHeight / img.naturalWidth;
-      const targetHeight = targetWidth * aspectRatio;
-      
-      // Find the image container and image element
-      const imageContainer = carCardRef.current.querySelector('.relative.h-\\[75vh\\]') as HTMLElement;
-      const imageElement = imageContainer?.querySelector('img') as HTMLImageElement;
-      
-      if (!imageContainer || !imageElement) {
-        throw new Error("Image elements not found");
-      }
+      const targetHeight = 1200;
+      const fixedCardWidth = 1200;
       
       // Store original styles
-      const originalContainerStyle = imageContainer.style.cssText;
-      const originalImageStyle = imageElement.style.cssText;
-      const originalImageClass = imageElement.className;
+      const originalStyle = carCardRef.current.style.cssText;
+      const originalWidth = carCardRef.current.style.width;
       
-      // Apply temporary styles for download
-      imageContainer.style.cssText = `height: ${targetHeight}px !important; min-height: ${targetHeight}px !important;`;
-      imageElement.style.cssText = 'width: 100%; height: 100%; object-fit: contain;';
-      imageElement.className = imageElement.className.replace('object-cover', 'object-contain');
+      // Set fixed width for consistent capture
+      carCardRef.current.style.width = `${fixedCardWidth}px`;
+      carCardRef.current.style.minWidth = `${fixedCardWidth}px`;
+      carCardRef.current.style.maxWidth = `${fixedCardWidth}px`;
       
-      // Wait a bit for styles to apply
+      // Wait for layout to settle
       await new Promise(resolve => setTimeout(resolve, 100));
       
-      const canvas = await html2canvas(carCardRef.current, {
-        scale: 2,
+      // Capture the card at fixed width
+      const originalCanvas = await html2canvas(carCardRef.current, {
+        scale: 1,
         useCORS: true,
         allowTaint: true,
         logging: false,
         backgroundColor: '#ffffff',
         foreignObjectRendering: false,
+        width: fixedCardWidth,
       });
       
       // Restore original styles
-      imageContainer.style.cssText = originalContainerStyle;
-      imageElement.style.cssText = originalImageStyle;
-      imageElement.className = originalImageClass;
+      carCardRef.current.style.cssText = originalStyle;
+      if (originalWidth) {
+        carCardRef.current.style.width = originalWidth;
+      }
+      
+      // Create a new canvas with fixed dimensions
+      const finalCanvas = document.createElement('canvas');
+      finalCanvas.width = targetWidth;
+      finalCanvas.height = targetHeight;
+      const ctx = finalCanvas.getContext('2d');
+      
+      if (!ctx) {
+        throw new Error("Failed to get canvas context");
+      }
+      
+      // Fill with white background (letterboxing)
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, targetWidth, targetHeight);
+      
+      // Calculate scaling to fit the card within fixed dimensions while maintaining aspect ratio
+      const cardWidth = originalCanvas.width;
+      const cardHeight = originalCanvas.height;
+      const scale = Math.min(targetWidth / cardWidth, targetHeight / cardHeight);
+      
+      // Calculate centered position
+      const scaledWidth = cardWidth * scale;
+      const scaledHeight = cardHeight * scale;
+      const x = (targetWidth - scaledWidth) / 2;
+      const y = (targetHeight - scaledHeight) / 2;
+      
+      // Draw the captured card centered on the fixed canvas
+      ctx.drawImage(originalCanvas, x, y, scaledWidth, scaledHeight);
       
       const link = document.createElement("a");
       link.download = `${car.year}-${car.model.replace(/\s+/g, "-")}.png`;
-      link.href = canvas.toDataURL("image/png");
+      link.href = finalCanvas.toDataURL("image/png");
       link.click();
       
       toast.success("Image downloaded successfully!");
